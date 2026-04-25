@@ -17,6 +17,8 @@ from PIL import Image
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 import config
 
+# For Streamlit Cloud: use app/data/ for small processed files
+APP_DATA = os.path.join(os.path.dirname(__file__), "data")
 
 st.set_page_config(
     page_title="TCGA-BRCA Subtype Classification",
@@ -76,7 +78,9 @@ with tab1:
     )
 
     st.subheader("PAM50 Subtype Distribution")
-    labels_path = os.path.join(config.DATA_PROCESSED, "tcga_brca_labels.csv")
+    labels_path = os.path.join(APP_DATA, "tcga_brca_labels.csv")
+    if not os.path.exists(labels_path):
+        labels_path = os.path.join(config.DATA_PROCESSED, "tcga_brca_labels.csv")
     if os.path.exists(labels_path):
         labels = pd.read_csv(labels_path, index_col=0).squeeze()
         if hasattr(labels, 'iloc') and not isinstance(labels, str):
