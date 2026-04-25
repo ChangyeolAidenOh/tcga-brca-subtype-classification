@@ -1,0 +1,163 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 700px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"borderWidth": 3, "color": {"background": "#378ADD", "border": "#1D9E75"}, "font": {"color": "#333333"}, "id": "MLPH", "label": "MLPH", "shape": "dot", "size": 56.953335, "title": "\u003cb\u003eMLPH\u003c/b\u003e\u003cbr\u003eSHAP: 0.2797\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: Yes"}, {"borderWidth": 3, "color": {"background": "#378ADD", "border": "#1D9E75"}, "font": {"color": "#333333"}, "id": "SFRP1", "label": "SFRP1", "shape": "dot", "size": 55.7908155, "title": "\u003cb\u003eSFRP1\u003c/b\u003e\u003cbr\u003eSHAP: 0.2719\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: Yes"}, {"borderWidth": 1, "color": {"background": "#378ADD", "border": "#378ADD"}, "font": {"color": "#333333"}, "id": "FOXA1", "label": "FOXA1", "shape": "dot", "size": 53.422425, "title": "\u003cb\u003eFOXA1\u003c/b\u003e\u003cbr\u003eSHAP: 0.2561\u003cbr\u003eStatus: Known\u003cbr\u003ePrognostic: No"}, {"borderWidth": 3, "color": {"background": "#378ADD", "border": "#1D9E75"}, "font": {"color": "#333333"}, "id": "NPY1R", "label": "NPY1R", "shape": "dot", "size": 47.828178, "title": "\u003cb\u003eNPY1R\u003c/b\u003e\u003cbr\u003eSHAP: 0.2189\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: Yes"}, {"borderWidth": 1, "color": {"background": "#378ADD", "border": "#378ADD"}, "font": {"color": "#333333"}, "id": "RRM2", "label": "RRM2", "shape": "dot", "size": 40.0589775, "title": "\u003cb\u003eRRM2\u003c/b\u003e\u003cbr\u003eSHAP: 0.1671\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: No"}, {"borderWidth": 1, "color": {"background": "#378ADD", "border": "#378ADD"}, "font": {"color": "#333333"}, "id": "AGR3", "label": "AGR3", "shape": "dot", "size": 40.023573, "title": "\u003cb\u003eAGR3\u003c/b\u003e\u003cbr\u003eSHAP: 0.1668\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: No"}, {"borderWidth": 1, "color": {"background": "#378ADD", "border": "#378ADD"}, "font": {"color": "#333333"}, "id": "SLC39A6", "label": "SLC39A6", "shape": "dot", "size": 39.492846, "title": "\u003cb\u003eSLC39A6\u003c/b\u003e\u003cbr\u003eSHAP: 0.1633\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: No"}, {"borderWidth": 3, "color": {"background": "#378ADD", "border": "#1D9E75"}, "font": {"color": "#333333"}, "id": "CEP55", "label": "CEP55", "shape": "dot", "size": 37.7972595, "title": "\u003cb\u003eCEP55\u003c/b\u003e\u003cbr\u003eSHAP: 0.1520\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: Yes"}, {"borderWidth": 1, "color": {"background": "#378ADD", "border": "#378ADD"}, "font": {"color": "#333333"}, "id": "NAT1", "label": "NAT1", "shape": "dot", "size": 34.407410999999996, "title": "\u003cb\u003eNAT1\u003c/b\u003e\u003cbr\u003eSHAP: 0.1294\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: No"}, {"borderWidth": 1, "color": {"background": "#378ADD", "border": "#378ADD"}, "font": {"color": "#333333"}, "id": "CYP2B7P", "label": "CYP2B7P", "shape": "dot", "size": 32.496500999999995, "title": "\u003cb\u003eCYP2B7P\u003c/b\u003e\u003cbr\u003eSHAP: 0.1166\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: No"}, {"borderWidth": 1, "color": {"background": "#378ADD", "border": "#378ADD"}, "font": {"color": "#333333"}, "id": "GATA3", "label": "GATA3", "shape": "dot", "size": 30.4654635, "title": "\u003cb\u003eGATA3\u003c/b\u003e\u003cbr\u003eSHAP: 0.1031\u003cbr\u003eStatus: Known\u003cbr\u003ePrognostic: No"}, {"borderWidth": 1, "color": {"background": "#378ADD", "border": "#378ADD"}, "font": {"color": "#333333"}, "id": "MAMDC2", "label": "MAMDC2", "shape": "dot", "size": 30.052770000000002, "title": "\u003cb\u003eMAMDC2\u003c/b\u003e\u003cbr\u003eSHAP: 0.1004\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: No"}, {"borderWidth": 1, "color": {"background": "#378ADD", "border": "#378ADD"}, "font": {"color": "#333333"}, "id": "AURKA", "label": "AURKA", "shape": "dot", "size": 28.673012999999997, "title": "\u003cb\u003eAURKA\u003c/b\u003e\u003cbr\u003eSHAP: 0.0912\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: No"}, {"borderWidth": 1, "color": {"background": "#378ADD", "border": "#378ADD"}, "font": {"color": "#333333"}, "id": "SLC16A6", "label": "SLC16A6", "shape": "dot", "size": 27.1768485, "title": "\u003cb\u003eSLC16A6\u003c/b\u003e\u003cbr\u003eSHAP: 0.0812\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: No"}, {"borderWidth": 1, "color": {"background": "#378ADD", "border": "#378ADD"}, "font": {"color": "#333333"}, "id": "MT1M", "label": "MT1M", "shape": "dot", "size": 27.00396375, "title": "\u003cb\u003eMT1M\u003c/b\u003e\u003cbr\u003eSHAP: 0.0800\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: No"}, {"borderWidth": 1, "color": {"background": "#378ADD", "border": "#378ADD"}, "font": {"color": "#333333"}, "id": "CA12", "label": "CA12", "shape": "dot", "size": 26.979537, "title": "\u003cb\u003eCA12\u003c/b\u003e\u003cbr\u003eSHAP: 0.0799\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: No"}, {"borderWidth": 1, "color": {"background": "#378ADD", "border": "#378ADD"}, "font": {"color": "#333333"}, "id": "CDC20", "label": "CDC20", "shape": "dot", "size": 26.0115795, "title": "\u003cb\u003eCDC20\u003c/b\u003e\u003cbr\u003eSHAP: 0.0734\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: No"}, {"borderWidth": 1, "color": {"background": "#378ADD", "border": "#378ADD"}, "font": {"color": "#333333"}, "id": "HOXA5", "label": "HOXA5", "shape": "dot", "size": 25.992086999999998, "title": "\u003cb\u003eHOXA5\u003c/b\u003e\u003cbr\u003eSHAP: 0.0733\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: No"}, {"borderWidth": 3, "color": {"background": "#378ADD", "border": "#1D9E75"}, "font": {"color": "#333333"}, "id": "SDC1", "label": "SDC1", "shape": "dot", "size": 24.835981500000003, "title": "\u003cb\u003eSDC1\u003c/b\u003e\u003cbr\u003eSHAP: 0.0656\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: Yes"}, {"borderWidth": 3, "color": {"background": "#378ADD", "border": "#1D9E75"}, "font": {"color": "#333333"}, "id": "TSLP", "label": "TSLP", "shape": "dot", "size": 24.0875862, "title": "\u003cb\u003eTSLP\u003c/b\u003e\u003cbr\u003eSHAP: 0.0606\u003cbr\u003eStatus: Novel\u003cbr\u003ePrognostic: Yes"}, {"color": "#E24B4A", "font": {"color": "#333333"}, "id": "Griscelli Syndrome", "label": "Griscelli Syndrome", "shape": "diamond", "size": 12, "title": "\u003cb\u003eGriscelli Syndrome\u003c/b\u003e\u003cbr\u003eType: Disease\u003cbr\u003eClass: Congenital"}, {"color": "#E24B4A", "font": {"color": "#333333"}, "id": "Breast Cancer Subtyping", "label": "Breast Cancer Subtyping", "shape": "diamond", "size": 12, "title": "\u003cb\u003eBreast Cancer Subtyping\u003c/b\u003e\u003cbr\u003eType: Disease\u003cbr\u003eClass: Neoplasms"}, {"color": "#1D9E75", "font": {"color": "#333333"}, "id": "Vesicle Transport", "label": "Vesicle Transport", "shape": "triangle", "size": 12, "title": "\u003cb\u003eVesicle Transport\u003c/b\u003e\u003cbr\u003eType: Pathway"}, {"color": "#E24B4A", "font": {"color": "#333333"}, "id": "Breast Cancer", "label": "Breast Cancer", "shape": "diamond", "size": 12, "title": "\u003cb\u003eBreast Cancer\u003c/b\u003e\u003cbr\u003eType: Disease\u003cbr\u003eClass: Neoplasms"}, {"color": "#E24B4A", "font": {"color": "#333333"}, "id": "Colorectal Cancer", "label": "Colorectal Cancer", "shape": "diamond", "size": 12, "title": "\u003cb\u003eColorectal Cancer\u003c/b\u003e\u003cbr\u003eType: Disease\u003cbr\u003eClass: Neoplasms"}, {"color": "#1D9E75", "font": {"color": "#333333"}, "id": "Wnt Signaling", "label": "Wnt Signaling", "shape": "triangle", "size": 12, "title": "\u003cb\u003eWnt Signaling\u003c/b\u003e\u003cbr\u003eType: Pathway"}, {"color": "#E24B4A", "font": {"color": "#333333"}, "id": "Luminal Breast Cancer", "label": "Luminal Breast Cancer", "shape": "diamond", "size": 12, "title": "\u003cb\u003eLuminal Breast Cancer\u003c/b\u003e\u003cbr\u003eType: Disease\u003cbr\u003eClass: Neoplasms"}, {"color": "#E24B4A", "font": {"color": "#333333"}, "id": "Prostate Cancer", "label": "Prostate Cancer", "shape": "diamond", "size": 12, "title": "\u003cb\u003eProstate Cancer\u003c/b\u003e\u003cbr\u003eType: Disease\u003cbr\u003eClass: Neoplasms"}, {"color": "#1D9E75", "font": {"color": "#333333"}, "id": "Transcriptional Regulation", "label": "Transcriptional Regulation", "shape": "triangle", "size": 12, "title": "\u003cb\u003eTranscriptional Regulation\u003c/b\u003e\u003cbr\u003eType: Pathway"}, {"color": "#E24B4A", "font": {"color": "#333333"}, "id": "Obesity", "label": "Obesity", "shape": "diamond", "size": 12, "title": "\u003cb\u003eObesity\u003c/b\u003e\u003cbr\u003eType: Disease\u003cbr\u003eClass: Metabolic"}, {"color": "#1D9E75", "font": {"color": "#333333"}, "id": "Neuropeptide Signaling", "label": "Neuropeptide Signaling", "shape": "triangle", "size": 12, "title": "\u003cb\u003eNeuropeptide Signaling\u003c/b\u003e\u003cbr\u003eType: Pathway"}, {"color": "#1D9E75", "font": {"color": "#333333"}, "id": "Protein Folding (ER)", "label": "Protein Folding (ER)", "shape": "triangle", "size": 12, "title": "\u003cb\u003eProtein Folding (ER)\u003c/b\u003e\u003cbr\u003eType: Pathway"}, {"color": "#1D9E75", "font": {"color": "#333333"}, "id": "Zinc Transport", "label": "Zinc Transport", "shape": "triangle", "size": 12, "title": "\u003cb\u003eZinc Transport\u003c/b\u003e\u003cbr\u003eType: Pathway"}, {"color": "#E24B4A", "font": {"color": "#333333"}, "id": "MARCH Syndrome", "label": "MARCH Syndrome", "shape": "diamond", "size": 12, "title": "\u003cb\u003eMARCH Syndrome\u003c/b\u003e\u003cbr\u003eType: Disease\u003cbr\u003eClass: Congenital"}, {"color": "#1D9E75", "font": {"color": "#333333"}, "id": "Cell Cycle", "label": "Cell Cycle", "shape": "triangle", "size": 12, "title": "\u003cb\u003eCell Cycle\u003c/b\u003e\u003cbr\u003eType: Pathway"}, {"color": "#E24B4A", "font": {"color": "#333333"}, "id": "Drug Metabolism Variation", "label": "Drug Metabolism Variation", "shape": "diamond", "size": 12, "title": "\u003cb\u003eDrug Metabolism Variation\u003c/b\u003e\u003cbr\u003eType: Disease\u003cbr\u003eClass: Pharmacogenomics"}, {"color": "#1D9E75", "font": {"color": "#333333"}, "id": "Drug Metabolism", "label": "Drug Metabolism", "shape": "triangle", "size": 12, "title": "\u003cb\u003eDrug Metabolism\u003c/b\u003e\u003cbr\u003eType: Pathway"}, {"color": "#E24B4A", "font": {"color": "#333333"}, "id": "Hypoparathyroidism", "label": "Hypoparathyroidism", "shape": "diamond", "size": 12, "title": "\u003cb\u003eHypoparathyroidism\u003c/b\u003e\u003cbr\u003eType: Disease\u003cbr\u003eClass: Endocrine"}, {"color": "#E24B4A", "font": {"color": "#333333"}, "id": "Ovarian Cancer", "label": "Ovarian Cancer", "shape": "diamond", "size": 12, "title": "\u003cb\u003eOvarian Cancer\u003c/b\u003e\u003cbr\u003eType: Disease\u003cbr\u003eClass: Neoplasms"}]);
+                  edges = new vis.DataSet([{"color": "#E24B4A", "from": "MLPH", "title": "ASSOCIATED_WITH", "to": "Griscelli Syndrome"}, {"color": "#E24B4A", "from": "MLPH", "title": "ASSOCIATED_WITH", "to": "Breast Cancer Subtyping"}, {"color": "#1D9E75", "from": "MLPH", "title": "PARTICIPATES_IN", "to": "Vesicle Transport"}, {"color": "#E24B4A", "from": "SFRP1", "title": "ASSOCIATED_WITH", "to": "Breast Cancer"}, {"color": "#E24B4A", "from": "SFRP1", "title": "ASSOCIATED_WITH", "to": "Colorectal Cancer"}, {"color": "#1D9E75", "from": "SFRP1", "title": "PARTICIPATES_IN", "to": "Wnt Signaling"}, {"color": "#E24B4A", "from": "FOXA1", "title": "ASSOCIATED_WITH", "to": "Luminal Breast Cancer"}, {"color": "#E24B4A", "from": "FOXA1", "title": "ASSOCIATED_WITH", "to": "Prostate Cancer"}, {"color": "#1D9E75", "from": "FOXA1", "title": "PARTICIPATES_IN", "to": "Transcriptional Regulation"}, {"color": "#E24B4A", "from": "NPY1R", "title": "ASSOCIATED_WITH", "to": "Obesity"}, {"color": "#E24B4A", "from": "NPY1R", "title": "ASSOCIATED_WITH", "to": "Breast Cancer"}, {"color": "#1D9E75", "from": "NPY1R", "title": "PARTICIPATES_IN", "to": "Neuropeptide Signaling"}, {"color": "#1D9E75", "from": "AGR3", "title": "PARTICIPATES_IN", "to": "Protein Folding (ER)"}, {"color": "#1D9E75", "from": "SLC39A6", "title": "PARTICIPATES_IN", "to": "Zinc Transport"}, {"color": "#E24B4A", "from": "CEP55", "title": "ASSOCIATED_WITH", "to": "Breast Cancer"}, {"color": "#E24B4A", "from": "CEP55", "title": "ASSOCIATED_WITH", "to": "MARCH Syndrome"}, {"color": "#1D9E75", "from": "CEP55", "title": "PARTICIPATES_IN", "to": "Cell Cycle"}, {"color": "#E24B4A", "from": "NAT1", "title": "ASSOCIATED_WITH", "to": "Breast Cancer"}, {"color": "#E24B4A", "from": "NAT1", "title": "ASSOCIATED_WITH", "to": "Drug Metabolism Variation"}, {"color": "#1D9E75", "from": "NAT1", "title": "PARTICIPATES_IN", "to": "Drug Metabolism"}, {"color": "#1D9E75", "from": "CYP2B7P", "title": "PARTICIPATES_IN", "to": "Drug Metabolism"}, {"color": "#E24B4A", "from": "GATA3", "title": "ASSOCIATED_WITH", "to": "Luminal Breast Cancer"}, {"color": "#E24B4A", "from": "GATA3", "title": "ASSOCIATED_WITH", "to": "Hypoparathyroidism"}, {"color": "#1D9E75", "from": "GATA3", "title": "PARTICIPATES_IN", "to": "Transcriptional Regulation"}, {"color": "#E24B4A", "from": "AURKA", "title": "ASSOCIATED_WITH", "to": "Breast Cancer"}, {"color": "#E24B4A", "from": "AURKA", "title": "ASSOCIATED_WITH", "to": "Ovarian Cancer"}, {"color": "#1D9E75", "from": "AURKA", "title": "PARTICIPATES_IN", "to": "Cell Cycle"}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "barnesHut": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.3,
+            "damping": 0.09,
+            "gravitationalConstant": -3000,
+            "springConstant": 0.001,
+            "springLength": 150
+        },
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
