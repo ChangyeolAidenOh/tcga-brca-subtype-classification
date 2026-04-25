@@ -58,9 +58,9 @@ This project addresses four questions:
 
 ### Feature Selection Pipeline
 
-The feature space was reduced through a multi-stage filtering process: 43,160 raw genes → 28,932 (low-expression filter) → 6,646 DESeq2 DEGs (TCGA Tumor vs Normal, 113 normal samples) → 1,103 GEO t-test DEGs → **526 Consensus DEGs** (GEO ∩ DESeq2, two independent datasets and statistical methods agree) → **516** (Kruskal-Wallis across PAM50 subtypes, adj. p < 0.01).
+The feature space was reduced through a multi-stage process. First, low-expression genes were removed (43,160 → 28,932). Then, two independent DEG analyses were performed in parallel: DESeq2 on TCGA RNA-seq (1,111 tumor vs 113 normal, 6,646 DEGs) and Welch's t-test on GEO GSE42568 microarray (87 tumor vs 17 normal, 1,103 DEGs). The intersection of these two DEG lists produced **526 Consensus DEGs** — genes differentially expressed in both independent datasets using different platforms and statistical methods. Finally, Kruskal-Wallis testing across PAM50 subtypes (adj. p < 0.01) yielded the final **516 features**.
 
-The consensus filter (GEO t-test ∩ DESeq2 negative binomial) represents genes differentially expressed in both an independent microarray dataset and TCGA RNA-seq, using two fundamentally different statistical frameworks. This is a custom preprocessing step designed for this pipeline, not an existing tool.
+This consensus filter is a custom preprocessing step designed for this pipeline, not an existing tool.
 
 ---
 
@@ -84,8 +84,8 @@ R: TCGAbiolinks + DESeq2                 Python: GEOparse
      ▼                  ▼                      ▼
   XGBoost          Stacking            Hierarchical
   (class weights)  (LGB+XGB+CB OOF)   (L1: ER+/ER-/Normal
-  Acc 0.905        Acc 0.932            L2a: LumA vs LumB 94.2%
-  F1 0.852         F1 0.869             L2b: Basal vs Her2 100%)
+  Acc 0.905        Acc 0.900            L2a: LumA vs LumB 92.3%
+  F1 0.852         F1 0.826             L2b: Basal vs Her2 98.2%)
      │                  │
      ├─ TabNet (pretrained, Acc 0.909, F1 0.864)
      │
@@ -112,7 +112,7 @@ R: TCGAbiolinks + DESeq2                 Python: GEOparse
          └──────────────┬──────────────────┘
                         ▼
               Knowledge Graph (pyvis)
-              + Streamlit Dashboard (5 tabs)
+              + Streamlit Dashboard (6 tabs)
 ```
 
 ---
@@ -125,21 +125,23 @@ TCGA-BRCA RNA-seq data (1,231 STAR-Counts files, 5.2 GB) was downloaded from GDC
 
 ### DEG Analysis — DESeq2 (R) + t-test (Python)
 
-Two independent DEG analyses were performed on different data sources using different statistical methods. DESeq2 (negative binomial GLM with Wald test) on TCGA RNA-seq raw counts (1,111 tumor vs 113 normal) identified 6,646 DEGs. Welch's t-test with Benjamini-Hochberg FDR on GEO GSE42568 microarray (87 tumor vs 17 normal) identified 1,103 DEGs. The consensus set (intersection) of 526 genes represents the most robust differentially expressed genes across datasets, platforms, and statistical methods.
+Two independent DEG analyses were performed in parallel on different data sources using different statistical methods. DESeq2 (negative binomial GLM with Wald test) on TCGA RNA-seq raw counts (1,111 tumor vs 113 normal) identified 6,646 DEGs. Welch's t-test with Benjamini-Hochberg FDR on GEO GSE42568 microarray (87 tumor vs 17 normal) identified 1,103 DEGs. The consensus set (intersection) of 526 genes represents genes confirmed as differentially expressed across both datasets, both platforms, and both statistical frameworks.
 
 The choice of t-test for GEO (microarray data is pre-normalized, continuous) vs DESeq2 for TCGA (RNA-seq raw counts follow negative binomial distribution) reflects the appropriate statistical method for each data type.
 
 ### Classification Models
 
+All models were trained on the same 516-feature consensus DEG dataset (1,099 samples) to ensure comparable results.
+
 **XGBoost Baseline with Imbalance Comparison**: Three strategies compared — no handling (F1 0.794), class weights (F1 0.852), SMOTE (F1 0.851). Class weights achieved the best Macro F1, consistent with the CXR pneumonia project where WeightedRandomSampler was also optimal.
 
-**Stacking Ensemble (OOF)**: LightGBM + XGBoost + CatBoost with Logistic Regression meta-learner, using Out-of-Fold predictions to prevent data leakage. Architecture directly transferred from the Stat Consulting Internship project. Achieved Acc 0.932, F1 0.869.
+**Stacking Ensemble (OOF)**: LightGBM + XGBoost + CatBoost with Logistic Regression meta-learner, using Out-of-Fold predictions to prevent data leakage. Architecture directly transferred from the Stat Consulting Internship project. Achieved Acc 0.900, F1 0.826. The ensemble underperformed XGBoost baseline — with only 516 features, the diversity benefit of multiple tree models diminishes and the meta-learner lacks class-weight protection for minority classes.
 
-**TabNet with Self-Supervised Pretraining**: Two-phase training — unsupervised pretraining learns feature structure from unlabeled data, then supervised fine-tuning with pretrained weights. This mirrors the CXR project's ImageNet-pretrained EfficientNet fine-tuning strategy. Pretraining improved TabNet from 83.6% to 90.9% accuracy (+7.3pp), achieving parity with XGBoost. Attention-based feature importance showed only 15% overlap with SHAP top 20 (consensus: CEP55, CDC20, NAT1 — all cell proliferation markers), demonstrating that different interpretation methods capture different aspects of the same data.
+**TabNet with Self-Supervised Pretraining**: Two-phase training — unsupervised pretraining learns feature structure from unlabeled data, then supervised fine-tuning with pretrained weights. This mirrors the CXR project's ImageNet-pretrained EfficientNet fine-tuning strategy. Pretraining improved TabNet from 83.6% to 90.9% accuracy (+7.3pp), achieving the best single-model performance. Attention-based feature importance showed only 15% overlap with SHAP top 20 (consensus: CEP55, CDC20, NAT1 — all cell proliferation markers), demonstrating that different interpretation methods capture different aspects of the same data.
 
-**Hierarchical Classifier**: Clinical decision structure mirroring the CXR 2-stage design. Level 1 separates ER+ / ER- / Normal-like (Acc 0.964), Level 2a classifies LumA vs LumB within ER+ (Acc 0.942), Level 2b classifies Basal vs HER2 within ER- (Acc 1.000). This decomposition reveals that classification difficulty is concentrated in a single boundary — Luminal A vs Luminal B.
+**Hierarchical Classifier**: Clinical decision structure mirroring the CXR 2-stage design. Level 1 separates ER+ / ER- / Normal-like (Acc 0.955), Level 2a classifies LumA vs LumB within ER+ (Acc 0.923), Level 2b classifies Basal vs HER2 within ER- (Acc 0.982). This decomposition reveals that classification difficulty is concentrated in a single boundary — Luminal A vs Luminal B — while Basal and HER2 are near-perfectly separable once isolated.
 
-**Multi-task Learning (Classification + Cox Survival)**: PyTorch network with shared encoder, classification head (CE loss), and survival head (Cox partial likelihood loss). Loss: CE + α*Cox, with α search over [0.01, 0.1, 0.5]. This mirrors the PINN project's multi-objective loss design (PDE residual + boundary condition). Best α=0.1 achieved F1 0.803 with Normal-like Recall 0.86. Multi-task top genes (TSLP, SFRP1) overlap with Cox regression's most significant survival genes, confirming the Cox loss guides learning toward clinically relevant features.
+**Multi-task Learning (Classification + Cox Survival)**: PyTorch network with shared encoder, classification head (CE loss), and survival head (Cox partial likelihood loss). Loss: CE + alpha * Cox, with alpha search over [0.01, 0.1, 0.5]. This mirrors the PINN project's multi-objective loss design (PDE residual + boundary condition). Best alpha=0.1 achieved F1 0.803 with Normal-like Recall 0.86. Multi-task top genes (TSLP, SFRP1) overlap with Cox regression's most significant survival genes, confirming the Cox loss guides learning toward clinically relevant features.
 
 ### Ablation Study — DEG Filter Effect
 
@@ -175,14 +177,14 @@ SHAP top 20 contained 5 Cox-significant genes vs multi-task top 20 with 2, indic
 
 ## Results
 
-### Classification Performance
+### Classification Performance (all on 516 consensus DEG features)
 
 | Model | Accuracy | Macro F1 | AUROC | Note |
 |---|---|---|---|---|
-| XGBoost (class weights) | 0.905 | 0.852 | 0.988 | Best single model |
-| Stacking Ensemble (OOF) | 0.932 | 0.869 | 0.993 | LGB+XGB+CB meta-learner |
-| TabNet (pretrained) | 0.909 | 0.864 | — | Self-supervised + fine-tuning |
-| Hierarchical Classifier | 0.923 | 0.880 | — | Level 2b: Basal vs HER2 = 100% |
+| TabNet (pretrained) | **0.909** | **0.864** | — | Self-supervised + fine-tuning, best single model |
+| XGBoost (class weights) | 0.905 | 0.852 | 0.988 | Best tree model |
+| Stacking Ensemble (OOF) | 0.900 | 0.826 | 0.988 | LGB+XGB+CB, diversity limited at 516 features |
+| Hierarchical Classifier | 0.900 | 0.845 | — | Level 2b: Basal vs HER2 = 98.2% |
 | Multi-task (alpha=0.1) | 0.874 | 0.803 | — | Normal-like Recall 0.86 |
 | Unfiltered (43,160 genes) | 0.904 | 0.828 | — | Ablation: full feature set |
 | METABRIC (independent) | 0.645 | 0.550 | — | Cross-platform baseline |
@@ -234,10 +236,10 @@ SHAP top 20 contained 5 Cox-significant genes vs multi-task top 20 with 2, indic
 Two independent DEG analyses (GEO t-test on microarray + DESeq2 on RNA-seq) intersected to produce 526 consensus genes. This reduced 43,160 features to 516 (after Kruskal-Wallis) with only 0.025 Macro F1 loss, while improving computational efficiency by approximately 80x.
 
 ### 2. Self-supervised pretraining rescues TabNet on small genomic data
-Without pretraining, TabNet achieved 83.6% accuracy — far below XGBoost (90.5%). With pretraining, TabNet reached 90.9%, achieving parity with tree models. This mirrors the CXR project's finding that pretrained models outperform scratch training on limited data.
+Without pretraining, TabNet achieved 83.6% accuracy — far below XGBoost (90.5%). With pretraining, TabNet reached 90.9%, surpassing XGBoost as the best single model. This mirrors the CXR project's finding that pretrained models outperform scratch training on limited data.
 
 ### 3. Hierarchical classification localizes difficulty to a single boundary
-Level 2b (Basal vs HER2) = 100% accuracy. Level 2a (LumA vs LumB) = 94.2%. The flat 5-class problem is actually a single hard 2-class problem (Luminal A vs B) surrounded by easy separations.
+Level 2b (Basal vs HER2) = 98.2% accuracy. Level 2a (LumA vs LumB) = 92.3%. The flat 5-class problem is dominated by a single hard 2-class problem (Luminal A vs B), while Basal and HER2 are near-perfectly separable once isolated from Luminal subtypes.
 
 ### 4. SFRP1 is the only independently prognostic biomarker
 In multivariate Cox controlling for subtype, only SFRP1 (Wnt signaling suppressor, HR=0.927, p=0.038) retains significance. MLPH and NPY1R — gold standard in univariate analysis — are confounded by subtype. TSLP shows the strongest univariate association (HR=0.861, p=0.0007) and is the only gene in both SHAP and multi-task top 20.
@@ -258,16 +260,19 @@ Cox partial likelihood as auxiliary loss (alpha=0.1) improved Normal-like Recall
 
 ## Dashboard
 
+Live demo: [Streamlit Cloud](https://tcga-brca-subtype-classification-m7rzyynaix.streamlit.app/)
+
 ```bash
 streamlit run app/streamlit_app.py
 ```
 
 | Tab | Content |
 |---|---|
-| Data Overview | PAM50 distribution, PCA scatter, GEO volcano plot |
-| Model Comparison | All models, imbalance strategy comparison |
-| Biomarker Discovery | SHAP summary/beeswarm, TabNet attention comparison, known gene validation |
+| Data Overview | PAM50 distribution, PCA scatter, GEO + DESeq2 volcano plots, ablation |
+| Model Comparison | All models, imbalance strategy, hierarchical levels, TabNet, multi-task |
+| Biomarker Discovery | SHAP summary/beeswarm, TabNet attention comparison, stability, confidence |
 | Clinical Validation | KM survival curves (gene selector), Cox forest plot, multivariate results |
+| Cross-Platform | METABRIC external validation, CORAL domain adaptation comparison |
 | Knowledge Graph | Interactive gene-disease-pathway network (pyvis) |
 
 ---
@@ -312,7 +317,9 @@ tcga-brca-subtype-classification/
 │       └── build_kg.py                      # DisGeNET KG (NetworkX + pyvis)
 │
 ├── app/
-│   └── streamlit_app.py                     # 5-tab dashboard
+│   ├── streamlit_app.py                     # 6-tab dashboard
+│   └── data/                                # Small data files for Streamlit Cloud
+│       └── tcga_brca_labels.csv
 │
 ├── data/
 │   ├── raw/                                 # GDC downloads + caches (gitignored)
@@ -404,9 +411,9 @@ R script downloads approximately 5.2 GB from GDC (cached after first run). METAB
 | CXR Pneumonia Detection | Pretrained fine-tuning (ImageNet → X-ray) | TabNet self-supervised pretrain → fine-tune |
 | Stat Consulting Ensemble | LGB+XGB+CB OOF stacking | Same architecture on genomic data |
 | GAM Parkinson's | Non-linearity diagnosis before model selection | Kruskal-Wallis (non-parametric) feature selection |
-| PINN Lookback Options | Multi-objective loss (PDE + boundary) | CE + alpha*Cox loss, alpha search |
+| PINN Lookback Options | Multi-objective loss (PDE + boundary) | CE + alpha * Cox loss, alpha search |
 | NBA Salary Prediction | PCA dimensionality reduction | PCA subtype separation analysis |
-| CNP VoC Pipeline | Streamlit dashboard, README conventions | 5-tab dashboard, ASCII pipeline |
+| CNP VoC Pipeline | Streamlit dashboard, README conventions | 6-tab dashboard, ASCII pipeline |
 | Consumer Signal Agent | Database schema design | KG graph schema |
 
 ---
@@ -420,7 +427,7 @@ XGBoost 2.x stores multiclass base_score as a vector. SHAP's XGBTreeModelLoader 
 TCGA (RNA-seq, DESeq2-normalized) and METABRIC (microarray, Z-scores) require independent standardization. Fitting a scaler on TCGA and transforming METABRIC produces severe scale mismatch (accuracy drops to 12%). CORAL further aligns covariance structures after independent scaling.
 
 ### Consensus DEG Filter
-Custom preprocessing: GEO microarray DEGs (t-test, 1,103 genes) intersected with TCGA RNA-seq DEGs (DESeq2, 6,646 genes) = 526 consensus genes. Two independent datasets, two platforms, two statistical methods — genes surviving this filter are the most robust differential expression signals. Ablation confirms 98.8% feature reduction with 2.5% F1 cost.
+Custom preprocessing: GEO microarray DEGs (t-test, 1,103 genes) intersected with TCGA RNA-seq DEGs (DESeq2, 6,646 genes) = 526 consensus genes. These two analyses used different datasets, different platforms, and different statistical methods — genes surviving this intersection are the most robust differential expression signals. Ablation confirms 98.8% feature reduction with 2.5% F1 cost.
 
 ### TabNet Pretraining
 Self-supervised pretraining on unlabeled expression data (pretraining_ratio=0.5) learns feature correlations before classification. This is analogous to masked language modeling in NLP — the model learns gene co-expression patterns, then fine-tunes for subtype classification. Improved accuracy from 83.6% to 90.9%.
