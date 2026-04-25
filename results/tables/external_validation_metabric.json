@@ -1,0 +1,54 @@
+{
+  "train_dataset": "TCGA-BRCA",
+  "test_dataset": "METABRIC",
+  "train_samples": 1099,
+  "test_samples": 1756,
+  "shared_genes": 503,
+  "accuracy": 0.6452164009111617,
+  "macro_f1": 0.5499763759667619,
+  "report": {
+    "BRCA_Basal": {
+      "precision": 0.49622166246851385,
+      "recall": 0.9425837320574163,
+      "f1-score": 0.6501650165016502,
+      "support": 209.0
+    },
+    "BRCA_Her2": {
+      "precision": 0.8,
+      "recall": 0.25,
+      "f1-score": 0.38095238095238093,
+      "support": 224.0
+    },
+    "BRCA_LumA": {
+      "precision": 0.6491228070175439,
+      "recall": 0.9514285714285714,
+      "f1-score": 0.7717265353418308,
+      "support": 700.0
+    },
+    "BRCA_LumB": {
+      "precision": 0.8586387434554974,
+      "recall": 0.3452631578947368,
+      "f1-score": 0.4924924924924925,
+      "support": 475.0
+    },
+    "BRCA_Normal": {
+      "precision": 0.6944444444444444,
+      "recall": 0.33783783783783783,
+      "f1-score": 0.45454545454545453,
+      "support": 148.0
+    },
+    "accuracy": 0.6452164009111617,
+    "macro avg": {
+      "precision": 0.6996855314771999,
+      "recall": 0.5654226598437125,
+      "f1-score": 0.5499763759667619,
+      "support": 1756.0
+    },
+    "weighted avg": {
+      "precision": 0.7106648481135188,
+      "recall": 0.6452164009111617,
+      "f1-score": 0.6051441103235313,
+      "support": 1756.0
+    }
+  }
+}

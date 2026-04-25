@@ -1,0 +1,18 @@
+{
+  "level1": {
+    "accuracy": 0.9636363636363636,
+    "macro_f1": 0.8944147246013906
+  },
+  "level2a_luminal": {
+    "accuracy": 0.9423076923076923,
+    "macro_f1": 0.9272350349831563
+  },
+  "level2b_erneg": {
+    "accuracy": 1.0,
+    "macro_f1": 1.0
+  },
+  "combined": {
+    "accuracy": 0.9227272727272727,
+    "macro_f1": 0.8802344373972281
+  }
+}

@@ -1,0 +1,40 @@
+node,node_type,shap,status,prognostic,disease_class
+MLPH,Gene,0.2796889,Novel,True,
+SFRP1,Gene,0.27193877,Novel,True,
+FOXA1,Gene,0.2561495,Known,False,
+NPY1R,Gene,0.21885452,Novel,True,
+RRM2,Gene,0.16705985,Novel,False,
+AGR3,Gene,0.16682382,Novel,False,
+SLC39A6,Gene,0.16328564,Novel,False,
+CEP55,Gene,0.15198173,Novel,True,
+NAT1,Gene,0.12938274,Novel,False,
+CYP2B7P,Gene,0.11664334,Novel,False,
+GATA3,Gene,0.10310309,Known,False,
+MAMDC2,Gene,0.1003518,Novel,False,
+AURKA,Gene,0.09115342,Novel,False,
+SLC16A6,Gene,0.08117899,Novel,False,
+MT1M,Gene,0.080026425,Novel,False,
+CA12,Gene,0.07986358,Novel,False,
+CDC20,Gene,0.07341053,Novel,False,
+HOXA5,Gene,0.07328058,Novel,False,
+SDC1,Gene,0.06557321,Novel,True,
+TSLP,Gene,0.060583908,Novel,True,
+Griscelli Syndrome,Disease,,,,Congenital
+Breast Cancer Subtyping,Disease,,,,Neoplasms
+Vesicle Transport,Pathway,,,,
+Breast Cancer,Disease,,,,Neoplasms
+Colorectal Cancer,Disease,,,,Neoplasms
+Wnt Signaling,Pathway,,,,
+Luminal Breast Cancer,Disease,,,,Neoplasms
+Prostate Cancer,Disease,,,,Neoplasms
+Transcriptional Regulation,Pathway,,,,
+Obesity,Disease,,,,Metabolic
+Neuropeptide Signaling,Pathway,,,,
+Protein Folding (ER),Pathway,,,,
+Zinc Transport,Pathway,,,,
+MARCH Syndrome,Disease,,,,Congenital
+Cell Cycle,Pathway,,,,
+Drug Metabolism Variation,Disease,,,,Pharmacogenomics
+Drug Metabolism,Pathway,,,,
+Hypoparathyroidism,Disease,,,,Endocrine
+Ovarian Cancer,Disease,,,,Neoplasms

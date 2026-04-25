@@ -1,0 +1,32 @@
+{
+  "filtered": {
+    "condition": "GEO-filtered (925 genes)",
+    "n_features": 516,
+    "accuracy_mean": 0.8798920713989208,
+    "accuracy_std": 0.013078809642703672,
+    "macro_f1_mean": 0.8026076278129709,
+    "macro_f1_std": 0.04709594739558569,
+    "per_class_recall": {
+      "BRCA_Basal": 0.9794871794871796,
+      "BRCA_Her2": 0.7691176470588236,
+      "BRCA_LumA": 0.9159420289855073,
+      "BRCA_LumB": 0.8132404181184668,
+      "BRCA_Normal": 0.45
+    }
+  },
+  "unfiltered": {
+    "condition": "Unfiltered (43160 genes)",
+    "n_features": 43160,
+    "accuracy_mean": 0.9035657949356579,
+    "accuracy_std": 0.01820350493406859,
+    "macro_f1_mean": 0.8279556922652288,
+    "macro_f1_std": 0.033376166340890946,
+    "per_class_recall": {
+      "BRCA_Basal": 0.9846153846153847,
+      "BRCA_Her2": 0.8779411764705882,
+      "BRCA_LumA": 0.9369641495041952,
+      "BRCA_LumB": 0.8375145180023228,
+      "BRCA_Normal": 0.425
+    }
+  }
+}

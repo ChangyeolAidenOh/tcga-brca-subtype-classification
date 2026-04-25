@@ -1,0 +1,7 @@
+Model,Accuracy,Macro F1,AUROC,CV Accuracy,CV Macro F1,Imbalance
+XGBoost Baseline,0.9318,0.8970,0.9942,0.9063 +/- 0.0089,0.7996 +/- 0.0489,smote
+Stacking Ensemble,0.9318,0.8691,0.9928,,,
+  Base: LightGBM,0.8976,nan,nan,,,
+  Base: XGBoost,0.9022,nan,nan,,,
+  Base: CatBoost,0.8851,nan,nan,,,
+TabNet,nan,nan,nan,,,

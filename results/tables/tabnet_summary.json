@@ -1,0 +1,11 @@
+{
+  "tabnet_accuracy": 0.9090909090909091,
+  "tabnet_macro_f1": 0.8640190552871712,
+  "top20_overlap_with_shap": 3,
+  "spearman_rho": -0.15468524884127077,
+  "consensus_genes": [
+    "NAT1",
+    "CDC20",
+    "CEP55"
+  ]
+}

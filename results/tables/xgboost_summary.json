@@ -1,0 +1,12 @@
+{
+  "best_strategy": "class_weights",
+  "test_metrics": {
+    "accuracy": 0.9045454545454545,
+    "macro_f1": 0.8519781583519483,
+    "auroc": 0.9880462778031929
+  },
+  "cv_accuracy_mean": 0.8798920713989208,
+  "cv_accuracy_std": 0.013078809642703672,
+  "cv_f1_mean": 0.8026076278129709,
+  "cv_f1_std": 0.04709594739558569
+}

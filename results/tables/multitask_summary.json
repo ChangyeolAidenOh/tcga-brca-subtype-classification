@@ -1,0 +1,10 @@
+{
+  "best_alpha": 0.1,
+  "accuracy": 0.8743961352657005,
+  "macro_f1": 0.8027689914441275,
+  "alpha_search": {
+    "0.01": "tested",
+    "0.1": "tested",
+    "0.5": "tested"
+  }
+}

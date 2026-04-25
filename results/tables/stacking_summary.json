@@ -1,0 +1,19 @@
+{
+  "stacking_accuracy": 0.9318181818181818,
+  "stacking_macro_f1": 0.8690680999245126,
+  "stacking_auroc": 0.9928020996120349,
+  "base_model_scores": {
+    "LightGBM": {
+      "mean_acc": 0.8976233766233765,
+      "std_acc": 0.02120482757370187
+    },
+    "XGBoost": {
+      "mean_acc": 0.9021688311688312,
+      "std_acc": 0.025736473767203966
+    },
+    "CatBoost": {
+      "mean_acc": 0.8850974025974025,
+      "std_acc": 0.02447337041225563
+    }
+  }
+}
