@@ -1,11 +1,20 @@
 {
   "tabnet_accuracy": 0.9090909090909091,
   "tabnet_macro_f1": 0.8640190552871712,
+  "tabnet_auroc": 0.9693324432916333,
+  "cv_accuracy_mean": 0.8671855541718555,
+  "cv_accuracy_std": 0.021821472596243705,
+  "cv_f1_mean": 0.7975615609974709,
+  "cv_f1_std": 0.037401943210162346,
+  "cv_auroc_mean": 0.9612688941825143,
+  "cv_auroc_std": 0.018196194026082215,
+  "imbalance_strategy": "class_weights (sample_weight)",
+  "pretraining": "self-supervised (pretraining_ratio=0.5)",
   "top20_overlap_with_shap": 3,
   "spearman_rho": -0.15468524884127077,
   "consensus_genes": [
-    "NAT1",
     "CDC20",
+    "NAT1",
     "CEP55"
   ]
 }

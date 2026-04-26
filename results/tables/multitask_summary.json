@@ -1,10 +1,13 @@
 {
-  "best_alpha": 0.1,
-  "accuracy": 0.8743961352657005,
-  "macro_f1": 0.8027689914441275,
-  "alpha_search": {
-    "0.01": "tested",
-    "0.1": "tested",
-    "0.5": "tested"
-  }
+  "best_alpha": 0.01,
+  "accuracy": 0.8840579710144928,
+  "macro_f1": 0.8306368524421263,
+  "auroc": 0.9828596001729709,
+  "cv_accuracy_mean": 0.882017728999578,
+  "cv_accuracy_std": 0.014795130831209658,
+  "cv_f1_mean": 0.8397827411140522,
+  "cv_f1_std": 0.036161510350556904,
+  "cv_auroc_mean": 0.9789200300147453,
+  "cv_auroc_std": 0.00697617012036071,
+  "imbalance_strategy": "class_weights + Cox(alpha=0.01)"
 }

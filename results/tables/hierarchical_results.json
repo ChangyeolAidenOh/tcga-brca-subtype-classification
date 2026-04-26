@@ -1,18 +1,24 @@
 {
   "level1": {
-    "accuracy": 0.9636363636363636,
-    "macro_f1": 0.8944147246013906
+    "accuracy": 0.9545454545454546,
+    "macro_f1": 0.86422757162307,
+    "auroc": 0.9945201938072538
   },
   "level2a_luminal": {
-    "accuracy": 0.9423076923076923,
-    "macro_f1": 0.9272350349831563
+    "accuracy": 0.9230769230769231,
+    "macro_f1": 0.9036838855731633,
+    "auroc": 0.9832915622389307
   },
   "level2b_erneg": {
-    "accuracy": 1.0,
-    "macro_f1": 1.0
+    "accuracy": 0.9821428571428571,
+    "macro_f1": 0.9785193709244342,
+    "auroc": 0.996875
   },
   "combined": {
-    "accuracy": 0.9227272727272727,
-    "macro_f1": 0.8802344373972281
-  }
+    "accuracy": 0.9,
+    "macro_f1": 0.8451794081807593,
+    "auroc": "N/A (multi-level structure)",
+    "cv": "N/A (multi-level structure)"
+  },
+  "imbalance_strategy": "class_weights (per level)"
 }

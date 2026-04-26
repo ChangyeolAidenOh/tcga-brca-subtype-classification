@@ -1,7 +1,9 @@
 Model,Accuracy,Macro F1,AUROC,CV Accuracy,CV Macro F1,Imbalance
-XGBoost Baseline,0.9318,0.8970,0.9942,0.9063 +/- 0.0089,0.7996 +/- 0.0489,smote
-Stacking Ensemble,0.9318,0.8691,0.9928,,,
-  Base: LightGBM,0.8976,nan,nan,,,
-  Base: XGBoost,0.9022,nan,nan,,,
-  Base: CatBoost,0.8851,nan,nan,,,
-TabNet,nan,nan,nan,,,
+XGBoost (class weights),0.9045,0.8520,0.9880,0.8799 +/- 0.0131,0.8026 +/- 0.0471,class_weights
+Stacking Ensemble,0.9000,0.8263,0.9883,0.8844 +/- 0.0046,0.7998 +/- 0.0368,"per-model (LGB is_unbalance, CB auto_balanced, XGB sample_weight)"
+TabNet (pretrained),0.9091,0.8640,0.9693,0.8672 +/- 0.0218,0.7976 +/- 0.0374,class_weights (sample_weight)
+Hierarchical,0.9000,0.8452,N/A (multi-level),N/A (multi-level),N/A (multi-level),class_weights (per level)
+Multi-task (alpha=0.1),0.8841,0.8306,0.9829,0.8820 +/- 0.0148,0.8398 +/- 0.0362,class_weights + Cox(alpha=0.01)
+METABRIC (Independent Scaling),0.6452,0.5500,N/A (external),N/A (external),N/A (external),N/A (external)
+METABRIC (CORAL),0.7386,0.6934,N/A (external),N/A (external),N/A (external),N/A (external)
+METABRIC (Reverse CORAL),0.6492,0.5588,N/A (external),N/A (external),N/A (external),N/A (external)

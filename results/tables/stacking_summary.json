@@ -1,19 +1,26 @@
 {
-  "stacking_accuracy": 0.9318181818181818,
-  "stacking_macro_f1": 0.8690680999245126,
-  "stacking_auroc": 0.9928020996120349,
+  "stacking_accuracy": 0.9,
+  "stacking_macro_f1": 0.8262958776908504,
+  "stacking_auroc": 0.9882689973923136,
+  "cv_accuracy_mean": 0.8844416770444168,
+  "cv_accuracy_std": 0.004599272730946164,
+  "cv_f1_mean": 0.7998161494349939,
+  "cv_f1_std": 0.036818241852890767,
+  "cv_auroc_mean": 0.9822777998532992,
+  "cv_auroc_std": 0.0020451290159627204,
+  "imbalance_strategy": "per-model (LGB is_unbalance, CB auto_balanced, XGB sample_weight)",
   "base_model_scores": {
     "LightGBM": {
-      "mean_acc": 0.8976233766233765,
-      "std_acc": 0.02120482757370187
+      "mean_acc": 0.8759805194805195,
+      "std_acc": 0.0208637222564026
     },
     "XGBoost": {
-      "mean_acc": 0.9021688311688312,
-      "std_acc": 0.025736473767203966
+      "mean_acc": 0.8771038961038962,
+      "std_acc": 0.029251718108725882
     },
     "CatBoost": {
-      "mean_acc": 0.8850974025974025,
-      "std_acc": 0.02447337041225563
+      "mean_acc": 0.8748571428571429,
+      "std_acc": 0.028973110581801385
     }
   }
 }
