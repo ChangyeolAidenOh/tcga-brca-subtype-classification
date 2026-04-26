@@ -91,8 +91,8 @@ R: TCGAbiolinks + DESeq2                 Python: GEOparse
      │
      ├─ Ablation: DEG filter ON(516) vs OFF(43K), F1 diff 0.025
      │
-     ├─ Multi-task: CE + α·Cox loss (α=0.1)
-     │   Normal-like Recall 0.86, F1 0.803
+     ├─ Multi-task: CE + α·Cox loss (α=0.01)
+     │   Normal-like Recall 1.00, F1 0.831
      │
      └─ METABRIC External Validation
          Independent: Acc 0.645 → CORAL: Acc 0.739 (+9.3pp)
@@ -141,7 +141,7 @@ All models were trained on the same 516-feature consensus DEG dataset (1,099 sam
 
 **Hierarchical Classifier**: Clinical decision structure mirroring the CXR 2-stage design. Level 1 separates ER+ / ER- / Normal-like (Acc 0.955), Level 2a classifies LumA vs LumB within ER+ (Acc 0.923), Level 2b classifies Basal vs HER2 within ER- (Acc 0.982). This decomposition reveals that classification difficulty is concentrated in a single boundary — Luminal A vs Luminal B — while Basal and HER2 are near-perfectly separable once isolated.
 
-**Multi-task Learning (Classification + Cox Survival)**: PyTorch network with shared encoder, classification head (CE loss), and survival head (Cox partial likelihood loss). Loss: CE + alpha * Cox, with alpha search over [0.01, 0.1, 0.5]. This mirrors the PINN project's multi-objective loss design (PDE residual + boundary condition). Best alpha=0.1 achieved F1 0.803 with Normal-like Recall 0.86. Multi-task top genes (TSLP, SFRP1) overlap with Cox regression's most significant survival genes, confirming the Cox loss guides learning toward clinically relevant features.
+**Multi-task Learning (Classification + Cox Survival)**: PyTorch network with shared encoder, classification head (CE loss), and survival head (Cox partial likelihood loss). Loss: CE + alpha * Cox, with alpha search over [0.01, 0.1, 0.5]. This mirrors the PINN project's multi-objective loss design (PDE residual + boundary condition). Best alpha=0.01 achieved F1 0.831 with Normal-like Recall 1.00. Multi-task top genes (SLC39A6, SFRP1, MAMDC2) overlap with Cox regression's most significant survival genes, confirming the Cox loss guides learning toward clinically relevant features.
 
 ### Ablation Study — DEG Filter Effect
 
@@ -181,14 +181,14 @@ SHAP top 20 contained 5 Cox-significant genes vs multi-task top 20 with 2, indic
 
 | Model | Accuracy | Macro F1 | AUROC | Note |
 |---|---|---|---|---|
-| TabNet (pretrained) | **0.909** | **0.864** | — | Self-supervised + fine-tuning, best single model |
+| TabNet (pretrained) | **0.909** | **0.864** | 0.969 | Self-supervised + fine-tuning, best single model |
 | XGBoost (class weights) | 0.905 | 0.852 | 0.988 | Best tree model |
 | Stacking Ensemble (OOF) | 0.900 | 0.826 | 0.988 | LGB+XGB+CB, diversity limited at 516 features |
-| Hierarchical Classifier | 0.900 | 0.845 | — | Level 2b: Basal vs HER2 = 98.2% |
-| Multi-task (alpha=0.1) | 0.874 | 0.803 | — | Normal-like Recall 0.86 |
+| Hierarchical Classifier | 0.900 | 0.845 | N/A (multi-level) | Level 2b: Basal vs HER2 = 98.2% |
+| Multi-task (alpha=0.01) | 0.884 | 0.831 | 0.983 | Normal-like Recall 1.00 |
 | Unfiltered (43,160 genes) | 0.904 | 0.828 | — | Ablation: full feature set |
-| METABRIC (independent) | 0.645 | 0.550 | — | Cross-platform baseline |
-| METABRIC (CORAL) | **0.739** | **0.693** | — | +9.3pp domain adaptation |
+| METABRIC (independent) | 0.645 | 0.550 | External Validation | Cross-platform baseline |
+| METABRIC (CORAL) | **0.739** | **0.693** | External Validation | +9.3pp domain adaptation |
 
 ### Per-Class Performance (XGBoost, class weights)
 
@@ -218,7 +218,7 @@ SHAP top 20 contained 5 Cox-significant genes vs multi-task top 20 with 2, indic
 | SHAP overlap | — | 3 (15%) | 3 (15%) |
 | TabNet overlap | 3 | — | — |
 | Multi-task overlap | 3 | — | — |
-| Consensus genes | — | CEP55, CDC20, NAT1 | MAMDC2, SFRP1, TSLP |
+| Consensus genes | — | CEP55, CDC20, NAT1 | SLC39A6, SFRP1, MAMDC2 |
 
 ### Prediction Confidence
 
@@ -242,10 +242,10 @@ Without pretraining, TabNet achieved 83.6% accuracy — far below XGBoost (90.5%
 Level 2b (Basal vs HER2) = 98.2% accuracy. Level 2a (LumA vs LumB) = 92.3%. The flat 5-class problem is dominated by a single hard 2-class problem (Luminal A vs B), while Basal and HER2 are near-perfectly separable once isolated from Luminal subtypes.
 
 ### 4. SFRP1 is the only independently prognostic biomarker
-In multivariate Cox controlling for subtype, only SFRP1 (Wnt signaling suppressor, HR=0.927, p=0.038) retains significance. MLPH and NPY1R — gold standard in univariate analysis — are confounded by subtype. TSLP shows the strongest univariate association (HR=0.861, p=0.0007) and is the only gene in both SHAP and multi-task top 20.
+In multivariate Cox controlling for subtype, only SFRP1 (Wnt signaling suppressor, HR=0.927, p=0.038) retains significance. MLPH and NPY1R, gold standard in univariate analysis, are confounded by subtype. Three genes appear in both SHAP and multi-task top 20 (SLC39A6, SFRP1, MAMDC2), but only SFRP1 is independently prognostic in multivariate Cox, reinforcing its role as the most trustworthy biomarker candidate.
 
 ### 5. Different interpretation methods see different genes
-SHAP (tree-based), TabNet attention, and multi-task gradients produce largely non-overlapping top 20 lists (10-15% overlap). Consensus genes across methods — CEP55, CDC20 (proliferation markers) and SFRP1, TSLP (survival markers) — are the most trustworthy candidates.
+SHAP (tree-based), TabNet attention, and multi-task gradients produce largely non-overlapping top 20 lists (10-15% overlap). The most trustworthy candidates are the consensus genes identified across methods: CEP55, CDC20, and NAT1 (SHAP-TabNet, proliferation markers) and SLC39A6, SFRP1, and MAMDC2 (SHAP-Multi-task).
 
 ### 6. CORAL domain adaptation: +9.3pp cross-platform improvement
 TCGA to METABRIC accuracy improved from 64.5% to 73.9% with CORAL covariance alignment. HER2 Recall doubled (25% to 55%), LumB improved from 35% to 58%. This ML technique is standard in computer vision but rarely applied in genomics cross-platform studies.
@@ -254,7 +254,7 @@ TCGA to METABRIC accuracy improved from 64.5% to 73.9% with CORAL covariance ali
 94.2% of predictions are high-confidence with 99.6% accuracy. 81% of misclassified samples fall in borderline/low confidence, enabling targeted clinical review of uncertain cases.
 
 ### 8. Multi-task survival loss improves minority class performance
-Cox partial likelihood as auxiliary loss (alpha=0.1) improved Normal-like Recall to 0.86, the highest across all models. The survival signal acts as a regularizer that prevents the model from ignoring minority classes — analogous to PINN's physics-informed loss constraining the solution space.
+Cox partial likelihood as auxiliary loss (alpha=0.01) improved Normal-like Recall to 1.00, the highest across all models. The survival signal acts as a regularizer that prevents the model from ignoring minority classes — analogous to PINN's physics-informed loss constraining the solution space.
 
 ---
 
@@ -433,4 +433,8 @@ Custom preprocessing: GEO microarray DEGs (t-test, 1,103 genes) intersected with
 Self-supervised pretraining on unlabeled expression data (pretraining_ratio=0.5) learns feature correlations before classification. This is analogous to masked language modeling in NLP — the model learns gene co-expression patterns, then fine-tunes for subtype classification. Improved accuracy from 83.6% to 90.9%.
 
 ### Multi-task Loss Design
-Total loss = CE(classification) + alpha * Cox(survival). alpha=0.01 underweights survival (F1=0.883), alpha=0.5 overweights it (F1=0.762), alpha=0.1 balances both (F1=0.803). This trade-off mirrors PINN's PDE residual weight tuning, where excessive physics constraints degrade boundary condition accuracy.
+Total loss = CE(classification) + alpha * Cox(survival). alpha=0.01 
+balances both (F1=0.831, best), alpha=0.1 adds more survival weight 
+(F1=0.791), alpha=0.5 overweights survival (F1=0.774). This trade-off 
+mirrors PINN's PDE residual weight tuning, where excessive physics 
+constraints degrade boundary condition accuracy.
