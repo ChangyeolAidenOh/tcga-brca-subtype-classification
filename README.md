@@ -133,13 +133,13 @@ The choice of t-test for GEO (microarray data is pre-normalized, continuous) vs 
 
 All models were trained on the same 516-feature consensus DEG dataset (1,099 samples) to ensure comparable results.
 
-**XGBoost Baseline with Imbalance Comparison**: Three strategies compared — no handling (F1 0.794), class weights (F1 0.852), SMOTE (F1 0.851). Class weights achieved the best Macro F1, consistent with the CXR pneumonia project where WeightedRandomSampler was also optimal.
+**XGBoost Baseline with Imbalance Comparison**: A comparison of three strategies showed the following results: no handling (F1 0.794), class weights (F1 0.852), and SMOTE (F1 0.851). Class weights achieved the highest Macro F1, consistent with the CXR pneumonia project findings where WeightedRandomSampler was also the optimal approach.
 
-**Stacking Ensemble (OOF)**: LightGBM + XGBoost + CatBoost with Logistic Regression meta-learner, using Out-of-Fold predictions to prevent data leakage. Architecture directly transferred from the Stat Consulting Internship project. Achieved Acc 0.900, F1 0.826. The ensemble underperformed XGBoost baseline — with only 516 features, the diversity benefit of multiple tree models diminishes and the meta-learner lacks class-weight protection for minority classes.
+**Stacking Ensemble (OOF)**: LightGBM + XGBoost + CatBoost with Logistic Regression meta-learner, using Out-of-Fold predictions to prevent data leakage. Architecture directly transferred from the Stat Consulting Internship project. Achieved Acc 0.900, F1 0.826. The ensemble underperformed XGBoost baseline: With only 516 features, the diversity benefit of multiple tree models diminishes and the meta-learner lacks class-weight protection for minority classes.
 
-**TabNet with Self-Supervised Pretraining**: Two-phase training — unsupervised pretraining learns feature structure from unlabeled data, then supervised fine-tuning with pretrained weights. This mirrors the CXR project's ImageNet-pretrained EfficientNet fine-tuning strategy. Pretraining improved TabNet from 83.6% to 90.9% accuracy (+7.3pp), achieving the best single-model performance. Attention-based feature importance showed only 15% overlap with SHAP top 20 (consensus: CEP55, CDC20, NAT1 — all cell proliferation markers), demonstrating that different interpretation methods capture different aspects of the same data.
+**TabNet with Self-Supervised Pretraining**: Two-phase training involves unsupervised pretraining to learn feature structure from unlabeled data, followed by supervised fine-tuning with pretrained weights. This mirrors the CXR project's ImageNet-pretrained EfficientNet fine-tuning strategy. Pretraining improved TabNet from 83.6% to 90.9% accuracy (+7.3pp), achieving the best single-model performance. Attention-based feature importance showed only 15% overlap with SHAP top 20 (consensus: CEP55, CDC20, NAT1, which are all cell proliferation markers), demonstrating that different interpretation methods capture different aspects of the same data.
 
-**Hierarchical Classifier**: Clinical decision structure mirroring the CXR 2-stage design. Level 1 separates ER+ / ER- / Normal-like (Acc 0.955), Level 2a classifies LumA vs LumB within ER+ (Acc 0.923), Level 2b classifies Basal vs HER2 within ER- (Acc 0.982). This decomposition reveals that classification difficulty is concentrated in a single boundary — Luminal A vs Luminal B — while Basal and HER2 are near-perfectly separable once isolated.
+**Hierarchical Classifier**: Clinical decision structure mirroring the CXR 2-stage design. Level 1 separates ER+ / ER- / Normal-like (Acc 0.955), Level 2a classifies LumA vs LumB within ER+ (Acc 0.923), Level 2b classifies Basal vs HER2 within ER- (Acc 0.982). This decomposition reveals that classification difficulty is concentrated in a single boundary, Luminal A vs Luminal B, while Basal and HER2 are near-perfectly separable once isolated.
 
 **Multi-task Learning (Classification + Cox Survival)**: PyTorch network with shared encoder, classification head (CE loss), and survival head (Cox partial likelihood loss). Loss: CE + alpha * Cox, with alpha search over [0.01, 0.1, 0.5]. This mirrors the PINN project's multi-objective loss design (PDE residual + boundary condition). Best alpha=0.01 achieved F1 0.831 with Normal-like Recall 1.00. Multi-task top genes (SLC39A6, SFRP1, MAMDC2) overlap with Cox regression's most significant survival genes, confirming the Cox loss guides learning toward clinically relevant features.
 
@@ -165,11 +165,11 @@ Prediction entropy identifies borderline classifications: 94.2% of samples class
 
 ### Kaplan-Meier Survival Analysis
 
-6 of 20 SHAP top genes (30%) showed significant survival associations: TSLP (p=0.010), MLPH (p=0.011), NPY1R (p=0.019), SFRP1 (p=0.022), SDC1 (p=0.024), CEP55 (p=0.048). FOXA1, despite being SHAP rank 3, showed no survival association (p=0.985) — a classification-only marker.
+6 of 20 SHAP top genes (30%) showed significant survival associations: TSLP (p=0.010), MLPH (p=0.011), NPY1R (p=0.019), SFRP1 (p=0.022), SDC1 (p=0.024), CEP55 (p=0.048). FOXA1, despite being SHAP rank 3, showed no survival association (p=0.985), a classification-only marker.
 
 ### Cox Proportional Hazards Regression
 
-Univariate Cox identified 6/29 candidate genes as significant, with hazard ratios quantifying effect magnitude. TSLP (HR=0.861, p=0.0007) showed the strongest protective effect. In multivariate Cox controlling for PAM50 subtype, only SFRP1 (HR=0.927, p=0.038) remained independently prognostic. All other genes' survival effects were confounded by subtype — they predict survival because they predict subtype, not independently.
+Univariate Cox identified 6/29 candidate genes as significant, with hazard ratios quantifying effect magnitude. TSLP (HR=0.861, p=0.0007) showed the strongest protective effect. In multivariate Cox controlling for PAM50 subtype, only SFRP1 (HR=0.927, p=0.038) remained independently prognostic. All other genes' survival effects were confounded by subtype, as they predict survival because they predict subtype, not independently.
 
 SHAP top 20 contained 5 Cox-significant genes vs multi-task top 20 with 2, indicating classification-focused features partially but not fully capture prognostic information.
 
@@ -236,7 +236,7 @@ SHAP top 20 contained 5 Cox-significant genes vs multi-task top 20 with 2, indic
 Two independent DEG analyses (GEO t-test on microarray + DESeq2 on RNA-seq) intersected to produce 526 consensus genes. This reduced 43,160 features to 516 (after Kruskal-Wallis) with only 0.025 Macro F1 loss, while improving computational efficiency by approximately 80x.
 
 ### 2. Self-supervised pretraining rescues TabNet on small genomic data
-Without pretraining, TabNet achieved 83.6% accuracy — far below XGBoost (90.5%). With pretraining, TabNet reached 90.9%, surpassing XGBoost as the best single model. This mirrors the CXR project's finding that pretrained models outperform scratch training on limited data.
+Without pretraining, TabNet achieved 83.6% accuracy, far below XGBoost (90.5%). With pretraining, TabNet reached 90.9%, surpassing XGBoost as the best single model. This mirrors the CXR project's finding that pretrained models outperform scratch training on limited data.
 
 ### 3. Hierarchical classification localizes difficulty to a single boundary
 Level 2b (Basal vs HER2) = 98.2% accuracy. Level 2a (LumA vs LumB) = 92.3%. The flat 5-class problem is dominated by a single hard 2-class problem (Luminal A vs B), while Basal and HER2 are near-perfectly separable once isolated from Luminal subtypes.
@@ -254,7 +254,7 @@ TCGA to METABRIC accuracy improved from 64.5% to 73.9% with CORAL covariance ali
 94.2% of predictions are high-confidence with 99.6% accuracy. 81% of misclassified samples fall in borderline/low confidence, enabling targeted clinical review of uncertain cases.
 
 ### 8. Multi-task survival loss improves minority class performance
-Cox partial likelihood as auxiliary loss (alpha=0.01) improved Normal-like Recall to 1.00, the highest across all models. The survival signal acts as a regularizer that prevents the model from ignoring minority classes — analogous to PINN's physics-informed loss constraining the solution space.
+Cox partial likelihood as auxiliary loss (alpha=0.01) improved Normal-like Recall to 1.00, the highest across all models. The survival signal acts as a regularizer that prevents the model from ignoring minority classes. The alpha search over [0.01, 0.1, 0.5] directly mirrors the PINN project's PDE residual weight tuning; the key design decision in both cases is balancing a data-driven objective (classification/boundary conditions) against a domain-informed constraint (survival dynamics/PDE physics), as excessive constraint weight can degrade the primary objective.
 
 ---
 
