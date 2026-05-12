@@ -453,4 +453,4 @@ with st.sidebar:
     st.markdown("TSLP — strongest survival association (p=0.0007)")
     st.markdown("MLPH, NPY1R — stable across all bootstraps")
     st.divider()
-    st.caption("Changyeol Oh | github.com/ChangyeolAidenOh")
+    
