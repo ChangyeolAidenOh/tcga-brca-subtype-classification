@@ -311,7 +311,7 @@ with tab4:
         with col3:
             st.metric("Classification-Only", n_total - n_sig)
 
-        st.info(f"**Key insight**: {n_sig}/{n_total} SHAP top genes are also prognostic biomarkers. "
+        st.info(f"**Finding**: {n_sig}/{n_total} SHAP top genes are also prognostic biomarkers. "
                 f"ML classification importance ≠ clinical prognostic value.")
 
         st.dataframe(

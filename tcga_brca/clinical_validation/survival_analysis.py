@@ -191,7 +191,7 @@ def main():
         for _, row in results_df[~results_df["significant"]].head(5).iterrows():
             print(f"  {row['gene']:15s} p={row['logrank_pvalue']:.4f}")
 
-    print(f"\nKey insight: ML classification importance != clinical prognostic value")
+    print(f"\nFinding: ML classification importance != clinical prognostic value")
     print(f"  {n_sig}/{n_total} SHAP top genes are also prognostic biomarkers")
     print(f"  {n_total - n_sig}/{n_total} are classification-only (subtype separation)")
 
